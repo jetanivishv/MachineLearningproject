@@ -33,12 +33,23 @@ def recommender(title,similarity_matrix,df,recommendno=5):
     final_recommended_courses=recommended_result[['course_title','similarity_score','url','price','num_subscribers']]
     return final_recommended_courses.head(recommendno)
 
-RESULT_TEMP = """
-<div style="width:90%;height:100%;margin:1px;padding:5px;position:relative;border-radius:5px;border-bottom-right-radius: 60px;
-box-shadow:0 0 15px 5px #ccc; background-color: #a8f0c6;
-  border-left: 5px solid #6c6c6c;">
+RESULT_FOUND = """
+<div style="width:90%;height:100%;margin:1px;padding:5px;position:relative;border-radius:5px;
+background-color:white;
+  border-left: 10px solid #6c6c6c;">
 <h4>{}</h4>
-<p style="color:blue;"><span style="color:black;">📈Score::</span>{}</p>
+<p style="color:blue;"><span style="color:black;">📈Similarity_Score::</span>{}</p>
+<p style="color:blue;"><span style="color:black;">🔗</span><a href="{}",target="_blank">Link</a></p>
+<p style="color:blue;"><span style="color:black;">💲Price:</span>{}</p>
+<p style="color:blue;"><span style="color:black;">🧑‍🎓👨🏽‍🎓 Students:</span>{}</p>
+</div>
+"""
+
+RESULT_NOT_FOUND = """
+<div style="width:90%;height:100%;margin:1px;padding:5px;position:relative;border-radius:5px;
+background-color:white;
+  border-left: 10px solid #6c6c6c;">
+<h4>{}</h4>
 <p style="color:blue;"><span style="color:black;">🔗</span><a href="{}",target="_blank">Link</a></p>
 <p style="color:blue;"><span style="color:black;">💲Price:</span>{}</p>
 <p style="color:blue;"><span style="color:black;">🧑‍🎓👨🏽‍🎓 Students:</span>{}</p>
@@ -51,7 +62,8 @@ def search_term_if_not_found(term,df,recommendno=6):
     df3=df[df['course_title'].str.contains(term.lower())]
     df4=df[df['course_title'].str.contains(term.upper())]
     result=pd.concat([df1,df2,df3,df4])
-    return result.head(recommendno)
+    final_result=result[['course_title','url','price','num_subscribers']]
+    return final_result.head(recommendno)
 
 def main():
     st.title("Udemy_dataset_Project")
@@ -89,20 +101,20 @@ def main():
                         price = row[1][3]
                         subscriber = row[1][4]
 
-                        stc.html(RESULT_TEMP.format(title,score,url,price,subscriber),height=350)
+                        stc.html(RESULT_FOUND.format(title,score,url,price,subscriber),height=250)
                 except:
                     results="Not Found"
                     st.warning(results)
                     result= search_term_if_not_found(search_term,df,recommendno)
+                    print(result)
                     if result.shape[0]:
                         st.info("Suggested Options include")
                         for row in result.iterrows():
                             title = row[1][0]
-                            score = row[1][1]
-                            url = row[1][2]
-                            price = row[1][3]
-                            subscriber = row[1][4]
-                            stc.html(RESULT_TEMP.format(title,score,url,price,subscriber),height=350)
+                            url = row[1][1]
+                            price = row[1][2]
+                            subscriber = row[1][3]
+                            stc.html(RESULT_NOT_FOUND.format(title,url,price,subscriber),height=200)
     elif choice=="Predict_Subject":
         st.subheader("Predict Subject from Course Name")
         search_term=st.text_input("Search").strip()
@@ -119,7 +131,7 @@ def main():
         level=st.selectbox("Level",levellist)
         duration=st.number_input("Content Duration",0.0,100.0,10.0,format="%.2f")
         lectures=st.number_input("Number of Lectures",0,800,50)
-        subscribers=st.number_input("Number of Subscribers",0,1000000,5000)
+        subscribers=st.number_input("Number of students",0,1000000,5000)
         reviews=st.number_input("Number of Reviews",0,100000,200)
         yearlist=[2012,2013,2014,2015,2016,2017]
         yr=st.selectbox("year",yearlist)
@@ -136,7 +148,7 @@ def main():
          
     else:
         st.subheader("About")
-        st.text("This project includes the machine learning concepts to predict and recommend the course details of udemy :")
+        st.text("This project includes the machine learning concepts to predict and recommend the course details of udemy")
         st.subheader("Dataset")
         st.text("Udemy Dataset from Kaggle")
         st.subheader("1.Recommendation System")
