@@ -85,7 +85,7 @@ def main():
         st.subheader("Recommend Course")
         similarity_matrix=to_cosine_similarity_matrix(df['clean_course_title'])
         search_term=st.text_input("Search").strip()
-        recommendno=st.sidebar.number_input("How Many Recommendation you want",4,30,7)
+        recommendno=st.sidebar.number_input("How Many Recommendation you want",1,30,7)
 
         if st.button("Recommend"):
             if search_term is not None:
@@ -122,7 +122,7 @@ def main():
             pickle_in = open('classifier.pkl', 'rb')
             classifier = pickle.load(pickle_in) 
             result = classifier.predict(vectorize_text(search_term))
-            st.success('The output is {}'.format(result[0]))
+            st.success('The Subject is {}'.format(result[0]))
     elif choice=="predict_Free_or_Paid":
         st.subheader("Predict whether course is free or paid")
         subjectlist=["Business Finance","Graphic Design","Musical Instruments","Web Development"]
